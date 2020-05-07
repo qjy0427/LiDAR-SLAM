@@ -1,7 +1,5 @@
-bag = rosbag('hallWay2.bag');
-% bSel1 = select(bag,'Topic','/odom');
+bag = rosbag('fifthLabScan.bag');
 bSel2 = select(bag,'Topic','/scan');
-% odom = readMessages(bSel1,'DataFormat','struct');
 scan = readMessages(bSel2,'DataFormat','struct');
 
 for iScan = 1:length(scan)
@@ -14,13 +12,15 @@ slamObj = lidarSLAM(resolution,maxRange);
 slamObj.LoopClosureThreshold = 360;
 slamObj.LoopClosureSearchRadius = 8;
 
-for iFrame = 1001:10:3001
+for iFrame = 1:length(scan)
     if mod(iFrame, 10) == 1
         disp(iFrame)
     end
     addScan(slamObj,scan{iFrame, 1});
 end
+
 show(slamObj)
+
 [scansSLAM,poses] = scansAndPoses(slamObj);
 occMap = buildMap(scansSLAM,poses,resolution,maxRange);
 figure
